@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import string
+import re
 import os
 import requests
 from bs4 import BeautifulSoup as BS
@@ -17,12 +18,21 @@ def recurse_create(e, current_key):
             os.system(f"touch {current_key}/{key}")
 
 
-if len(sys.argv) != 2:
-    print("Usage: ./main.py url")
+def recurse_path(e, current_key):
+    if (current_key == "."):
+        return "."
+    else:
+        for key in e:
+            if current_key in e[key]:
+                return f"{recurse_path(e, key)}/{current_key}"
+
+
+if len(sys.argv) != 3:
+    print("Usage: ./main.py url login")
     exit(1)
 
 try:
-    os.system(f"curl {sys.argv[1]} > r.tmp")
+    os.system(f"curl {sys.argv[1]} 2>/dev/null > r.tmp")
 except Exception as err:
     print(f'Error occurred: {err}')
 
@@ -31,6 +41,13 @@ f = open("r.tmp", "r")
 soup = BS(f, "html.parser")
 
 codes = soup.find_all("code", attrs={"class":"language-none"})
+
+all_pres = soup.find_all("code", attrs={"class":"language-bash"})
+
+for elem in all_pres:
+    if "git" in elem.string:
+        git_url = elem.string.split("clone ")[1]
+
 
 for code in codes:
     if "$ tree" in str(code.string):
@@ -127,5 +144,79 @@ for (key, val) in d.items():
 
 
 recurse_create(e, ".")
+
+
+all_pres = soup.find_all("code", attrs={"class":"language-c"})
+
+for iterator in range(len(all_pres)):
+    all_pres[iterator] = (all_pres[iterator].parent.previous_sibling.previous_sibling.string,all_pres[iterator])
+
+to_remove = []
+
+for iterator in range(len(all_pres)):
+    if (all_pres[iterator] is None):
+        to_remove.append(all_pres[iterator])
+
+for delete in to_remove:
+    all_pres.remove(delete)
+
+while len(all_pres) > 0:
+    for key in e:
+        if all_pres[0][0] in e[key]:
+            path = recurse_path(e, all_pres[0][0])
+            content = str(all_pres[0][1].string)
+            file_content = "\n".join([line[padding::] for line in content.split("\n")])
+            g = open(path, "w")
+            g.write(file_content)
+            g.close()
+
+    del all_pres[0]
+
+all_pres = soup.find_all("code", attrs={"class":"language-makefile"})
+
+for iterator in range(len(all_pres)):
+    all_pres[iterator] = (all_pres[iterator].parent.previous_sibling.previous_sibling.string,all_pres[iterator])
+
+to_remove = []
+
+for iterator in range(len(all_pres)):
+    if (all_pres[iterator] is None):
+        to_remove.append(all_pres[iterator])
+
+for delete in to_remove:
+    all_pres.remove(delete)
+
+all_files = []
+
+for key in e:
+    for elem in e[key]:
+        if re.match("(\w*(?<!main|test)\.(c|h))$", elem) and elem[-2] not in all_files:
+            all_files.append(elem[:-2])
+
+while len(all_pres) > 0:
+    content = str(all_pres[0][1].string)
+    file_content = "\n".join([line[padding::] for line in content.split("\n")])
+    for elem in re.findall("(\w*\.(o|c|h))", file_content):
+        if elem[0][:-2] in all_files:
+            path_file = recurse_path(e, f"{elem[0][:-2]}.c").split("/")
+            path_makefile = path_file
+            path_makefile[-1] = "Makefile"
+            path_makefile = "/".join(path_makefile)
+            g = open(path_makefile, "w")
+            g.write(file_content)
+            g.close()
+
+    del all_pres[0]
+
+
+login = sys.argv[2];
+
+git_url = git_url.replace("john.smith", login)
+
+os.system("git init")
+os.system(f"git remote add origin {git_url}")
+
+
+f.close()
 
 os.system("rm r.tmp")
