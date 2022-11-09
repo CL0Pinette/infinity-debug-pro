@@ -20,6 +20,8 @@ $ . .venv/bin/activate
 $ ./main.py url login path
 ```
 The url is the complete URL of the subject http://....HTML
+
 The login is your full login
+
 The path given is a relative path from where you launch the
 script to the directory where all the files will be created
