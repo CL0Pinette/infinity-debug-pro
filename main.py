@@ -18,8 +18,8 @@ def recurse_create(e, current_key):
 
 
 def recurse_path(e, current_key):
-    if (current_key == f"./{sys.argv[3]}"):
-        return f"./{sys.argv[3]}"
+    if (current_key == "."):
+        return "."
     else:
         for key in e:
             if current_key in e[key]:
@@ -31,7 +31,7 @@ if len(sys.argv) != 4:
     exit(1)
 
 try:
-    os.system(f"curl {sys.argv[1]} > r.tmp")
+    os.system(f"curl {sys.argv[1]} 2>/dev/null > r.tmp")
 except Exception as err:
     print(f'Error occurred: {err}')
 
@@ -120,10 +120,10 @@ for key in to_remove:
     d.pop(key)
 
 lastvals = [0]
-previouskey = f"./{sys.argv[3]}"
-parentkeys = [f"./{sys.argv[3]}"]
+previouskey = f"{sys.argv[3]}"
+parentkeys = [f"{sys.argv[3]}"]
 
-e = {f"./{sys.argv[3]}":[]}
+e = {".":[f"{sys.argv[3]}"], f"{sys.argv[3]}":[]}
 
 
 for (key, val) in d.items():
@@ -141,8 +141,15 @@ for (key, val) in d.items():
         e[parentkeys[-1]].append(key.split("-")[1])
         previouskey = key.split("-")[1]
 
+recurse_create(e, f".")
 
-recurse_create(e, f"./{sys.argv[3]}")
+login = sys.argv[2];
+
+path_authors = recurse_path(e, "AUTHORS")
+content = f"{re.sub('[0-9]','',login).split('.')[0].capitalize()}\n{login.split('.')[1].capitalize()}\n{login}\n{login}@epita.fr\n"
+g = open(path_authors, "w")
+g.write(content)
+g.close()
 
 
 all_pres = soup.find_all("code", attrs={"class":"language-c"})
@@ -208,12 +215,10 @@ while len(all_pres) > 0:
     del all_pres[0]
 
 
-login = sys.argv[2];
-
 git_url = git_url.replace("john.smith", login)
 
-os.system("git init")
-os.system(f"git remote add origin {git_url}")
+os.system(f"cd {sys.argv[3]} && git init")
+os.system(f"cd {sys.argv[3]} && git remote add origin {git_url}")
 
 
 f.close()
