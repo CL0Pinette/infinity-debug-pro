@@ -3,7 +3,6 @@
 import string
 import re
 import os
-import requests
 from bs4 import BeautifulSoup as BS
 import sys
 
@@ -12,15 +11,15 @@ import sys
 def recurse_create(e, current_key):
     for key in e[current_key.split("/")[-1]]:
         if key in e:
-            os.system(f"mkdir {current_key}/{key}")
+            os.system(f"mkdir -p {current_key}/{key}")
             recurse_create(e, f"{current_key}/{key}")
         else:
             os.system(f"touch {current_key}/{key}")
 
 
 def recurse_path(e, current_key):
-    if (current_key == "."):
-        return "."
+    if (current_key == f"./{sys.argv[3]}"):
+        return f"./{sys.argv[3]}"
     else:
         for key in e:
             if current_key in e[key]:
@@ -28,11 +27,11 @@ def recurse_path(e, current_key):
 
 
 if len(sys.argv) != 3:
-    print("Usage: ./main.py url login")
+    print("Usage: ./main.py url login destination_folder")
     exit(1)
 
 try:
-    os.system(f"curl {sys.argv[1]} 2>/dev/null > r.tmp")
+    os.system(f"curl {sys.argv[1]} > r.tmp")
 except Exception as err:
     print(f'Error occurred: {err}')
 
@@ -121,10 +120,10 @@ for key in to_remove:
     d.pop(key)
 
 lastvals = [0]
-previouskey = "."
-parentkeys = ["."]
+previouskey = f"./{sys.argv[3]}"
+parentkeys = [f"./{sys.argv[3]}"]
 
-e = {".":[]}
+e = {f"./{sys.argv[3]}":[]}
 
 
 for (key, val) in d.items():
@@ -143,7 +142,7 @@ for (key, val) in d.items():
         previouskey = key.split("-")[1]
 
 
-recurse_create(e, ".")
+recurse_create(e, f"./{sys.argv[3]}")
 
 
 all_pres = soup.find_all("code", attrs={"class":"language-c"})
@@ -195,7 +194,7 @@ for key in e:
 
 while len(all_pres) > 0:
     content = str(all_pres[0][1].string)
-    file_content = "\n".join([line[padding::] for line in content.split("\n")])
+    file_content = "\n".join([line[padding::] for line in content.split("\n")[1:]])
     for elem in re.findall("(\w*\.(o|c|h))", file_content):
         if elem[0][:-2] in all_files:
             path_file = recurse_path(e, f"{elem[0][:-2]}.c").split("/")
