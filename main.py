@@ -165,7 +165,7 @@ while len(all_pres) > 0:
         if all_pres[0][0] in e[key]:
             path = recurse_path(e, all_pres[0][0])
             content = str(all_pres[0][1].string)
-            file_content = "\n".join([line[padding::] for line in content.split("\n")])
+            file_content = "\n".join([line[padding::] for line in content.split("\n")[1:]])
             g = open(path, "w")
             g.write(file_content)
             g.close()
