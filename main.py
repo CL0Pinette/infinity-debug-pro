@@ -15,6 +15,7 @@ def recurse_create(e, current_key):
                 os.system(f"mkdir -p {current_key}/{key}")
                 recurse_create(e, f"{current_key}/{key}")
             else:
+                os.system(f"mkdir -p {current_key}")
                 os.system(f"touch {current_key}/{key}")
     else:
         for key in e[current_key.split("/")[-1]]:
@@ -22,6 +23,7 @@ def recurse_create(e, current_key):
                 os.system(f"mkdir -p {current_key}/{key}")
                 recurse_create(e, f"{current_key}/{key}")
             else:
+                os.system(f"mkdir -p {current_key}")
                 os.system(f"touch {current_key}/{key}")
 
 
@@ -173,15 +175,29 @@ for iterator in range(len(all_pres)):
 for delete in to_remove:
     all_pres.remove(delete)
 
+last_directory_name = ""
 while len(all_pres) > 0:
+    count = 0
     for key in e:
         if all_pres[0][0] in e[key]:
-            path = recurse_path(e, all_pres[0][0])
-            content = str(all_pres[0][1].string)
-            file_content = "\n".join([line[padding::] for line in content.split("\n")[1:]])
-            g = open(path, "w")
-            g.write(file_content)
-            g.close()
+            count += 1
+
+    if count == 1:
+        path = recurse_path(e, all_pres[0][0])
+        content = str(all_pres[0][1].string)
+        file_content = "\n".join([line[padding::] for line in content.split("\n")[1:]])
+        last_directory_name = path.split("/")[-2]
+        g = open(path, "w")
+        g.write(file_content)
+        g.close()
+
+    elif count > 1:
+        path = f"{recurse_path(e, last_directory_name)}/{all_pres[0][0]}"
+        content = str(all_pres[0][1].string)
+        file_content = "\n".join([line[padding::] for line in content.split("\n")[1:]])
+        g = open(path, "w")
+        g.write(file_content)
+        g.close()
 
     del all_pres[0]
 
