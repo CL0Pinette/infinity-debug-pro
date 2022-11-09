@@ -26,7 +26,7 @@ def recurse_path(e, current_key):
                 return f"{recurse_path(e, key)}/{current_key}"
 
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print("Usage: ./main.py url login destination_folder")
     exit(1)
 
