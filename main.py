@@ -9,12 +9,20 @@ import sys
 
 
 def recurse_create(e, current_key):
-    for key in e[current_key.split("/")[-1]]:
-        if key in e:
-            os.system(f"mkdir -p {current_key}/{key}")
-            recurse_create(e, f"{current_key}/{key}")
-        else:
-            os.system(f"touch {current_key}/{key}")
+    if current_key == sys.argv[3]:
+        for key in e[current_key]:
+            if key in e:
+                os.system(f"mkdir -p {current_key}/{key}")
+                recurse_create(e, f"{current_key}/{key}")
+            else:
+                os.system(f"touch {current_key}/{key}")
+    else:
+        for key in e[current_key.split("/")[-1]]:
+            if key in e:
+                os.system(f"mkdir -p {current_key}/{key}")
+                recurse_create(e, f"{current_key}/{key}")
+            else:
+                os.system(f"touch {current_key}/{key}")
 
 
 def recurse_path(e, current_key):
@@ -123,8 +131,7 @@ lastvals = [0]
 previouskey = f"{sys.argv[3]}"
 parentkeys = [f"{sys.argv[3]}"]
 
-e = {".":[f"{sys.argv[3]}"], f"{sys.argv[3]}":[]}
-
+e = {".":[sys.argv[3]], sys.argv[3]:[]}
 
 for (key, val) in d.items():
     if (val == lastvals[-1]):
@@ -141,7 +148,7 @@ for (key, val) in d.items():
         e[parentkeys[-1]].append(key.split("-")[1])
         previouskey = key.split("-")[1]
 
-recurse_create(e, f".")
+recurse_create(e, f"{sys.argv[3]}")
 
 login = sys.argv[2];
 
