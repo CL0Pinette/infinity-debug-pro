@@ -12,14 +12,14 @@ $ nix-shell
 ```sh
 $ python3 -m venv .venv
 $ . .venv/bin/activate
-(venv)$ pip3 install -r requirements.text
+(venv)$ pip3 install -r requirements.txt
 ```
 
 ## Usage
 ```sh
 $ ./main.py url login path
 ```
-The url is the complete URL of the subject http://....HTML
+The url is the complete URL of the subject http://....html
 
 The login is your full login
 
