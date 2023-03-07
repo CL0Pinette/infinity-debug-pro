@@ -242,7 +242,9 @@ git_url = git_url.replace("john.smith", login)
 
 os.system(f"cd {sys.argv[3]} && git init")
 os.system(f"cd {sys.argv[3]} && git remote add origin {git_url}")
-
+os.system(f"cd {sys.argv[3]} && git add *")
+os.system(f"cd {sys.argv[3]} && git commit -m Init")
+os.system(f"cd {sys.argv[3]} && git push --set-upstream origin master")
 
 f.close()
 
